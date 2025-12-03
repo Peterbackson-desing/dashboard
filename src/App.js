@@ -117,7 +117,7 @@ function App() {
     <div className={`app-container theme-${theme}`}>
       <header className="app-header" role="banner">
         <div className="header-content">
-          <h1 className="header-title">Sistema de Monitoreo IoT</h1>
+          <h1 className="header-title">Evaluación 3</h1>
           <div className="header-right">
             <div 
               className={`connection-badge connection-${connection}`}
@@ -140,7 +140,7 @@ function App() {
 
       <main className="app-main" role="main">
         <section className="section" aria-label="Métricas del sistema">
-          <h2 className="section-title">Métricas en Tiempo Real</h2>
+          <h2 className="section-title">Registros</h2>
           <div className="metrics-grid">
             <article className="metric-card" aria-labelledby="temp-label">
               <div className="metric-label" id="temp-label">Temperatura</div>
