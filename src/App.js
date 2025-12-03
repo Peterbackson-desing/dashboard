@@ -304,17 +304,12 @@ function App() {
         <section className="section" aria-labelledby="student-info-title">
           <div className="student-info">
             <h2 className="student-name" id="student-info-title">
-              Pedro Javier Ramirez Ramire
+              Pedro Javier Ramirez Ramirez
             </h2>
             <div className="metric-label">Matrícula</div>
             <div className="student-id">2023171040</div>
           </div>
         </section>
-
-        <footer className="app-footer" role="contentinfo">
-          <p className="footer-text">Dashboard IoT con soporte WCAG 2.1</p>
-          <p className="footer-text">Protocolo MQTT sobre WebSockets Seguro</p>
-        </footer>
       </main>
     </div>
   );
