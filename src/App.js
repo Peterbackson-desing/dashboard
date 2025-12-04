@@ -32,10 +32,9 @@ function App() {
     topicPub: '2023171040/cmd'
   };
 
-  // Auto-scroll del log cuando hay nuevos mensajes
   useEffect(() => {
     if (otaLogRef.current) {
-      otaLogRef.current.scrollTop = 0; // Scroll al inicio (más reciente)
+      otaLogRef.current.scrollTop = 0;
     }
   }, [otaLog]);
 
@@ -61,8 +60,6 @@ function App() {
         client.on('message', (topic, message) => {
           try {
             const msgStr = message.toString();
-            
-            // Detectar mensajes de OTA con múltiples patrones
             const isOtaMessage = msgStr.includes('[OTA]') || 
                                  msgStr.includes('OTA') || 
                                  msgStr.includes('Reboot') ||
@@ -88,11 +85,10 @@ function App() {
                   message: msgStr,
                   timestamp: Date.now()
                 }];
-                return newLog.slice(-50); // Mantener últimos 50 mensajes
+                return newLog.slice(-50);
               });
             }
             
-            // Intentar parsear como JSON para telemetría
             const data = JSON.parse(msgStr);
             setTelemetry(prev => ({
               ...prev,
@@ -109,7 +105,6 @@ function App() {
               return newHistory.slice(-20);
             });
           } catch (e) {
-            // Si no es JSON, verificar si es mensaje de OTA
             const msgStr = message.toString();
             const isOtaMessage = msgStr.includes('[OTA]') || 
                                  msgStr.includes('OTA') || 
@@ -178,8 +173,6 @@ function App() {
     
     const cmd = { action: 'ota', url: otaUrl };
     clientRef.current.publish(MQTT_CONFIG.topicPub, JSON.stringify(cmd), { qos: 1 });
-    
-    // Agregar mensaje local al log
     setOtaLog(prev => {
       const newLog = [...prev, {
         time: new Date().toLocaleTimeString(),
@@ -206,26 +199,25 @@ function App() {
   };
 
   const getLogClass = (msg) => {
-    // Clasificar mensaje por contenido
-    if (msg.includes('✅') || msg.includes('completado') || msg.includes('exitosamente') || msg.includes('validado correctamente')) {
+    if (msg.includes('') || msg.includes('completado') || msg.includes('exitosamente') || msg.includes('validado correctamente')) {
       return 'log-success';
-    } else if (msg.includes('❌') || msg.includes('ERROR') || msg.includes('FAILED') || msg.includes('fallida') || msg.includes('corrupta')) {
+    } else if (msg.includes('') || msg.includes('ERROR') || msg.includes('FAILED') || msg.includes('fallida') || msg.includes('corrupta')) {
       return 'log-error';
-    } else if (msg.includes('⚠️') || msg.includes('WARNING') || msg.includes('abortado')) {
+    } else if (msg.includes('') || msg.includes('WARNING') || msg.includes('abortado')) {
       return 'log-warning';
-    } else if (msg.includes('🚀') || msg.includes('Iniciando') || msg.includes('STARTED')) {
+    } else if (msg.includes('') || msg.includes('Iniciando') || msg.includes('STARTED')) {
       return 'log-info';
-    } else if (msg.includes('📊') || msg.includes('Progreso') || msg.includes('%')) {
+    } else if (msg.includes('') || msg.includes('Progreso') || msg.includes('%')) {
       return 'log-progress';
-    } else if (msg.includes('🔄') || msg.includes('Reiniciando')) {
+    } else if (msg.includes('') || msg.includes('Reiniciando')) {
       return 'log-reboot';
-    } else if (msg.includes('📦') || msg.includes('Tamaño') || msg.includes('📍') || msg.includes('📥')) {
+    } else if (msg.includes('') || msg.includes('Tamaño') || msg.includes('📍') || msg.includes('📥')) {
       return 'log-data';
-    } else if (msg.includes('🔗') || msg.includes('Conectando')) {
+    } else if (msg.includes('') || msg.includes('Conectando')) {
       return 'log-connection';
-    } else if (msg.includes('🔍') || msg.includes('Validando')) {
+    } else if (msg.includes('') || msg.includes('Validando')) {
       return 'log-validation';
-    } else if (msg.includes('💾') || msg.includes('Configurando')) {
+    } else if (msg.includes('') || msg.includes('Configurando')) {
       return 'log-config';
     }
     return '';
@@ -253,7 +245,7 @@ function App() {
               onClick={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')}
               aria-label="Cambiar tema"
             >
-              {theme === 'dark' ? '☀️ Claro' : '🌙 Oscuro'}
+              {theme === 'dark' ? ' Claro' : ' Oscuro'}
             </button>
           </div>
         </div>
@@ -273,7 +265,7 @@ function App() {
             <div className="metric-card">
               <div className="metric-label">Estado Actual</div>
               <div className="metric-value">
-                {telemetry.vibrating_now ? '🔴 Vibrando' : '🟢 Reposo'}
+                {telemetry.vibrating_now ? ' Vibrando' : ' Reposo'}
               </div>
               <div className="metric-info">Sensor: {telemetry.sensor}</div>
             </div>
@@ -282,7 +274,7 @@ function App() {
               <div className="metric-label">Estado del Sistema</div>
               <div className="metric-value">{telemetry.state || 'DESCONOCIDO'}</div>
               <div className="metric-info">
-                Modo: {telemetry.manual ? 'Manual 🔧' : 'Automático ⚙️'}
+                Modo: {telemetry.manual ? 'Manual ' : 'Automático '}
               </div>
             </div>
 
@@ -307,7 +299,7 @@ function App() {
                 <div>
                   <div className="control-title">LED Indicador</div>
                   <div className="control-status">
-                    Estado: {telemetry.led ? '🟢 Encendido' : '⚫ Apagado'}
+                    Estado: {telemetry.led ? ' Encendido' : ' Apagado'}
                   </div>
                 </div>
               </div>
@@ -334,7 +326,7 @@ function App() {
                 <div>
                   <div className="control-title">Relay (Actuador)</div>
                   <div className="control-status">
-                    Estado: {telemetry.relay ? '⚡ Activado' : '⭕ Desactivado'}
+                    Estado: {telemetry.relay ? ' Activado' : ' Desactivado'}
                   </div>
                 </div>
               </div>
@@ -363,21 +355,21 @@ function App() {
               onClick={() => sendCommand('auto')}
               disabled={connection !== 'connected'}
             >
-              ⚙️ Modo Automático
+               Modo Automático
             </button>
             <button
               className="btn btn-secondary"
               onClick={() => sendCommand('test_sequence')}
               disabled={connection !== 'connected'}
             >
-              🧪 Secuencia de Prueba
+               Secuencia de Prueba
             </button>
             <button
               className="btn btn-warning"
               onClick={() => sendCommand('reset_counter')}
               disabled={connection !== 'connected'}
             >
-              🔄 Resetear Contador
+               Resetear Contador
             </button>
           </div>
         </section>
@@ -401,23 +393,23 @@ function App() {
               onClick={triggerOTA}
               disabled={connection !== 'connected'}
             >
-              📡 Iniciar Actualización OTA
+               Iniciar Actualización OTA
             </button>
             <div className="warning-box">
-              ⚠️ El dispositivo se reiniciará después de la actualización
+               El dispositivo se reiniciará después de la actualización
             </div>
             
             {/* OTA Log */}
             {otaLog.length > 0 && (
               <div className="ota-log">
                 <div className="ota-log-header">
-                  <h3 className="ota-log-title">📋 Log de Actualización OTA</h3>
+                  <h3 className="ota-log-title"> Log de Actualización OTA</h3>
                   <button 
                     className="btn-clear-log"
                     onClick={clearOtaLog}
                     title="Limpiar log"
                   >
-                    🗑️ Limpiar
+                     Limpiar
                   </button>
                 </div>
                 <div className="ota-log-content" ref={otaLogRef}>
@@ -464,7 +456,7 @@ function App() {
                     <tr key={idx}>
                       <td>{entry.time}</td>
                       <td>{entry.vibCount}</td>
-                      <td>{entry.vibrating ? '🔴 Sí' : '🟢 No'}</td>
+                      <td>{entry.vibrating ? ' Sí' : ' No'}</td>
                       <td className={getStateClass(entry.state)}>
                         {entry.state}
                       </td>
