@@ -1,4 +1,6 @@
-/* Reset y Base */
+/* ========================================
+   RESET Y BASE
+======================================== */
 * {
   margin: 0;
   padding: 0;
@@ -6,141 +8,131 @@
 }
 
 body {
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Variables de Tema */
+/* ========================================
+   VARIABLES DE TEMA
+======================================== */
 .theme-dark {
-  --bg-primary: #111827;
-  --bg-secondary: #1f2937;
-  --bg-tertiary: #374151;
-  --text-primary: #f3f4f6;
-  --text-secondary: #9ca3af;
-  --border-color: #374151;
-  --border-light: #4b5563;
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #1a1a1a;
+  --bg-card: #242424;
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --border-color: #333333;
   
-  --state-normal: #4ade80;
-  --state-alert: #fbbf24;
-  --state-critical: #f87171;
-  --state-default: #9ca3af;
+  --color-success: #22c55e;
+  --color-danger: #ef4444;
+  --color-warning: #f59e0b;
+  --color-primary: #3b82f6;
   
-  --success-bg: #065f46;
-  --success-hover: #047857;
-  --danger-bg: #991b1b;
-  --danger-hover: #7f1d1d;
-  --primary-bg: #1e40af;
-  --primary-hover: #1e3a8a;
-  
-  --connection-success-bg: #064e3b;
-  --connection-success-text: #34d399;
-  --connection-success-border: #065f46;
-  --connection-error-bg: #7f1d1d;
-  --connection-error-text: #fca5a5;
-  --connection-error-border: #991b1b;
+  --state-normal: #22c55e;
+  --state-alert: #f59e0b;
+  --state-critical: #ef4444;
 }
 
 .theme-light {
-  --bg-primary: #f9fafb;
-  --bg-secondary: #ffffff;
-  --bg-tertiary: #f3f4f6;
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
-  --border-color: #e5e7eb;
-  --border-light: #d1d5db;
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-card: #ffffff;
+  --text-primary: #0a0a0a;
+  --text-secondary: #666666;
+  --border-color: #e0e0e0;
+  
+  --color-success: #16a34a;
+  --color-danger: #dc2626;
+  --color-warning: #d97706;
+  --color-primary: #2563eb;
   
   --state-normal: #16a34a;
-  --state-alert: #ca8a04;
+  --state-alert: #d97706;
   --state-critical: #dc2626;
-  --state-default: #6b7280;
-  
-  --success-bg: #16a34a;
-  --success-hover: #15803d;
-  --danger-bg: #dc2626;
-  --danger-hover: #b91c1c;
-  --primary-bg: #2563eb;
-  --primary-hover: #1d4ed8;
-  
-  --connection-success-bg: #d1fae5;
-  --connection-success-text: #065f46;
-  --connection-success-border: #a7f3d0;
-  --connection-error-bg: #fee2e2;
-  --connection-error-text: #991b1b;
-  --connection-error-border: #fecaca;
 }
 
-/* Container Principal */
-.app-container {
+/* ========================================
+   LAYOUT PRINCIPAL
+======================================== */
+.app {
   min-height: 100vh;
   background-color: var(--bg-primary);
   color: var(--text-primary);
-  transition: background-color 0.3s, color 0.3s;
+  transition: all 0.3s ease;
 }
 
-/* Header */
-.app-header {
-  border-bottom: 1px solid var(--border-color);
+/* ========================================
+   HEADER
+======================================== */
+.header {
   background-color: var(--bg-secondary);
-  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 1rem 0;
 }
 
 .header-content {
   max-width: 1200px;
   margin: 0 auto;
+  padding: 0 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  flex-wrap: wrap;
   gap: 1rem;
+  flex-wrap: wrap;
 }
 
 .header-title {
   font-size: 1.5rem;
   font-weight: 600;
-  margin: 0;
+  letter-spacing: -0.02em;
 }
 
-.header-right {
+.header-actions {
   display: flex;
-  gap: 1rem;
+  gap: 0.75rem;
   align-items: center;
   flex-wrap: wrap;
 }
 
-/* Connection Badge */
+/* ========================================
+   CONNECTION BADGE
+======================================== */
 .connection-badge {
   padding: 0.5rem 1rem;
-  border-radius: 4px;
+  border-radius: 6px;
   font-size: 0.875rem;
   font-weight: 500;
+  border: 1px solid;
 }
 
 .connection-connected {
-  background-color: var(--connection-success-bg);
-  color: var(--connection-success-text);
-  border: 1px solid var(--connection-success-border);
+  background-color: rgba(34, 197, 94, 0.1);
+  color: var(--color-success);
+  border-color: var(--color-success);
 }
 
-.connection-connecting {
-  background-color: var(--connection-error-bg);
-  color: var(--connection-error-text);
-  border: 1px solid var(--connection-error-border);
-}
-
+.connection-connecting,
 .connection-disconnected,
 .connection-error {
-  background-color: var(--connection-error-bg);
-  color: var(--connection-error-text);
-  border: 1px solid var(--connection-error-border);
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
 }
 
-/* Theme Button */
-.theme-button {
+/* ========================================
+   BUTTONS
+======================================== */
+.btn-theme {
   padding: 0.5rem 1rem;
-  border: 1px solid var(--border-light);
-  border-radius: 4px;
-  background-color: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background-color: var(--bg-card);
   color: var(--text-primary);
   cursor: pointer;
   font-size: 0.875rem;
@@ -148,17 +140,71 @@ body {
   transition: all 0.2s;
 }
 
-.theme-button:hover {
+.btn-theme:hover {
   opacity: 0.8;
 }
 
-.theme-button:focus-visible {
-  outline: 2px solid var(--primary-bg);
-  outline-offset: 2px;
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-/* Main Content */
-.app-main {
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.btn-success {
+  background-color: var(--color-success);
+  color: white;
+}
+
+.btn-danger {
+  background-color: var(--color-danger);
+  color: white;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+.btn-secondary {
+  background-color: transparent;
+  color: var(--text-primary);
+  border: 2px solid var(--border-color);
+}
+
+.btn-warning {
+  background-color: transparent;
+  color: var(--color-warning);
+  border: 2px solid var(--color-warning);
+}
+
+.btn-ota {
+  background-color: #8b5cf6;
+  color: white;
+  width: 100%;
+  padding: 1rem;
+  font-size: 1rem;
+}
+
+/* ========================================
+   MAIN CONTENT
+======================================== */
+.main-content {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem;
@@ -169,14 +215,16 @@ body {
 }
 
 .section-title {
-  font-size: 1.125rem;
+  font-size: 1.25rem;
   font-weight: 600;
   margin-bottom: 1rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid var(--border-color);
 }
 
-/* Metrics Grid */
+/* ========================================
+   METRICS GRID
+======================================== */
 .metrics-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -184,29 +232,35 @@ body {
 }
 
 .metric-card {
-  background-color: var(--bg-secondary);
+  background-color: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 4px;
+  border-radius: 8px;
   padding: 1.5rem;
+  transition: all 0.2s;
+}
+
+.metric-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .metric-label {
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-size: 0.75rem;
+  font-weight: 600;
   color: var(--text-secondary);
-  margin-bottom: 0.5rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
+  margin-bottom: 0.5rem;
 }
 
 .metric-value {
   font-size: 2.5rem;
   font-weight: 700;
   line-height: 1;
+  margin: 0.5rem 0;
 }
 
 .metric-value-small {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
 }
 
 .metric-info {
@@ -215,7 +269,7 @@ body {
   margin-top: 0.5rem;
 }
 
-/* State Colors */
+/* Estado colors */
 .state-normal {
   color: var(--state-normal);
 }
@@ -228,36 +282,46 @@ body {
   color: var(--state-critical);
 }
 
-.state-default {
-  color: var(--state-default);
+.metric-card.state-normal {
+  border-color: var(--state-normal);
+  background-color: rgba(34, 197, 94, 0.05);
 }
 
-/* Control Panel */
-.control-group {
-  display: flex;
-  flex-direction: column;
+.metric-card.state-alert {
+  border-color: var(--state-alert);
+  background-color: rgba(245, 158, 11, 0.05);
+}
+
+.metric-card.state-critical {
+  border-color: var(--state-critical);
+  background-color: rgba(239, 68, 68, 0.05);
+}
+
+/* ========================================
+   CONTROL PANEL
+======================================== */
+.control-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 1rem;
+  margin-bottom: 1rem;
 }
 
-.control-item {
-  background-color: var(--bg-secondary);
+.control-card {
+  background-color: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 4px;
-  padding: 1.25rem;
+  border-radius: 8px;
+  padding: 1.5rem;
 }
 
 .control-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 1rem;
-  flex-wrap: wrap;
-  gap: 0.5rem;
 }
 
 .control-title {
   font-size: 1rem;
   font-weight: 600;
+  margin-bottom: 0.25rem;
 }
 
 .control-status {
@@ -265,214 +329,227 @@ body {
   color: var(--text-secondary);
 }
 
-/* Buttons */
 .button-group {
   display: flex;
   gap: 0.5rem;
-  flex-wrap: wrap;
 }
 
-.btn {
+.button-group .btn {
   flex: 1;
-  min-width: 100px;
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 4px;
+}
+
+.action-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+/* ========================================
+   OTA UPDATE
+======================================== */
+.ota-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
   font-size: 0.875rem;
   font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #ffffff;
+  margin-bottom: 0.5rem;
 }
 
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.btn:focus-visible {
-  outline: 2px solid var(--primary-bg);
-  outline-offset: 2px;
-}
-
-.btn-success {
-  background-color: var(--success-bg);
-}
-
-.btn-success:not(:disabled):hover {
-  background-color: var(--success-hover);
-}
-
-.btn-danger {
-  background-color: var(--danger-bg);
-}
-
-.btn-danger:not(:disabled):hover {
-  background-color: var(--danger-hover);
-}
-
-.btn-primary {
-  background-color: var(--primary-bg);
-}
-
-.btn-primary:not(:disabled):hover {
-  background-color: var(--primary-hover);
-}
-
-.btn-outline {
-  background-color: transparent;
-  color: var(--text-primary);
-  border: 2px solid var(--border-light);
-}
-
-.btn-outline:not(:disabled):hover {
-  border-color: var(--primary-bg);
-  color: var(--primary-bg);
-}
-
-.btn-full {
+.form-input {
   width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  transition: all 0.2s;
 }
 
-/* Table */
+.form-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.warning-box {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: rgba(245, 158, 11, 0.1);
+  border: 1px solid var(--color-warning);
+  border-radius: 6px;
+  color: var(--color-warning);
+  font-size: 0.875rem;
+}
+
+/* ========================================
+   HISTORY TABLE
+======================================== */
 .table-container {
   overflow-x: auto;
-  overflow-y: auto;
   border: 1px solid var(--border-color);
-  border-radius: 4px;
-  max-height: 400px;
-}
-
-.table-container:focus-visible {
-  outline: 2px solid var(--primary-bg);
-  outline-offset: 2px;
+  border-radius: 8px;
+  background-color: var(--bg-card);
 }
 
 .history-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.875rem;
 }
 
-.history-table thead tr {
-  background-color: var(--bg-tertiary);
-  border-bottom: 1px solid var(--border-light);
+.history-table thead {
+  background-color: var(--bg-secondary);
 }
 
 .history-table th {
-  padding: 0.75rem;
+  padding: 1rem;
   text-align: left;
+  font-size: 0.75rem;
   font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  border-bottom: 2px solid var(--border-color);
 }
 
-.history-table tbody tr {
+.history-table td {
+  padding: 1rem;
   border-bottom: 1px solid var(--border-color);
 }
 
 .history-table tbody tr:hover {
-  background-color: var(--bg-tertiary);
+  background-color: var(--bg-secondary);
 }
 
-.history-table td {
-  padding: 0.75rem;
+.history-table tbody tr:last-child td {
+  border-bottom: none;
 }
 
 .table-empty {
   text-align: center;
-  padding: 2rem;
+  padding: 3rem;
   color: var(--text-secondary);
 }
 
-/* Student Info */
-.student-info {
-  text-align: center;
-  padding: 2rem;
-  background-color: var(--bg-secondary);
+/* ========================================
+   STUDENT INFO
+======================================== */
+.student-card {
+  background-color: var(--bg-card);
   border: 1px solid var(--border-color);
-  border-radius: 4px;
+  border-radius: 8px;
+  padding: 2rem;
+  text-align: center;
 }
 
 .student-name {
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   font-weight: 600;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 .student-id {
-  font-size: 1rem;
-  color: var(--text-secondary);
-  font-family: monospace;
+  font-size: 1.25rem;
+  font-family: 'Courier New', monospace;
+  color: var(--color-primary);
+  font-weight: 600;
   margin-top: 0.5rem;
 }
 
-/* Footer */
-.app-footer {
-  text-align: center;
-  padding: 2rem 1rem;
-  border-top: 1px solid var(--border-color);
-  margin-top: 2rem;
-}
-
-.footer-text {
-  font-size: 0.875rem;
-  color: var(--text-secondary);
-  margin: 0.25rem 0;
-}
-
-/* Responsive Design */
+/* ========================================
+   RESPONSIVE DESIGN
+======================================== */
 @media (max-width: 768px) {
   .header-content {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
   }
-  
-  .header-right {
+
+  .header-actions {
     width: 100%;
     justify-content: space-between;
   }
-  
+
   .metrics-grid {
     grid-template-columns: 1fr;
   }
-  
-  .metric-value {
-    font-size: 2rem;
+
+  .control-grid {
+    grid-template-columns: 1fr;
   }
-  
+
+  .action-buttons {
+    grid-template-columns: 1fr;
+  }
+
   .button-group {
     flex-direction: column;
   }
-  
-  .btn {
-    width: 100%;
+
+  .metric-value {
+    font-size: 2rem;
   }
 }
 
 @media (max-width: 480px) {
-  .app-main {
+  .main-content {
     padding: 1rem 0.5rem;
   }
-  
+
   .metric-card,
-  .control-item {
+  .control-card,
+  .ota-card {
     padding: 1rem;
   }
-  
+
   .header-title {
     font-size: 1.25rem;
   }
+
+  .metric-value {
+    font-size: 1.75rem;
+  }
 }
 
-/* Print Styles */
+/* ========================================
+   ACCESIBILIDAD
+======================================== */
+*:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ========================================
+   PRINT STYLES
+======================================== */
 @media print {
-  .header-right,
-  .control-group,
-  .app-footer {
+  .header-actions,
+  .control-grid,
+  .action-buttons,
+  .ota-card {
     display: none;
   }
-  
+
   .metric-card,
   .table-container {
     break-inside: avoid;

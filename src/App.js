@@ -5,17 +5,18 @@ import './App.css';
 function App() {
   const [theme, setTheme] = useState('dark');
   const [telemetry, setTelemetry] = useState({
-    temperature: 0,
-    humidity: 0,
+    vibration_count: 0,
+    vibrating_now: false,
     state: 'NORMAL',
     manual: false,
     led: 0,
     relay: 0,
     timestamp: Date.now() / 1000,
-    sensor: 'DHT11'
+    sensor: 'SW-420'
   });
   const [connection, setConnection] = useState('disconnected');
   const [history, setHistory] = useState([]);
+  const [otaUrl, setOtaUrl] = useState('https://ota-server-320033886492.us-central1.run.app/firmware');
   const clientRef = useRef(null);
 
   const MQTT_CONFIG = {
@@ -59,8 +60,8 @@ function App() {
             setHistory(prev => {
               const newHistory = [...prev, {
                 time: new Date().toLocaleTimeString(),
-                temp: data.temperature,
-                hum: data.humidity,
+                vibCount: data.vibration_count || 0,
+                vibrating: data.vibrating_now || false,
                 state: data.state
               }];
               return newHistory.slice(-20);
@@ -97,7 +98,19 @@ function App() {
     clientRef.current.publish(MQTT_CONFIG.topicPub, JSON.stringify(cmd), { qos: 1 });
   };
 
-  const getStateColor = (state) => {
+  const triggerOTA = () => {
+    if (!clientRef.current || connection !== 'connected') {
+      alert('No conectado al broker MQTT');
+      return;
+    }
+    if (!window.confirm('¿Confirmar actualización OTA? El ESP32 se reiniciará.')) return;
+    
+    const cmd = { action: 'ota', url: otaUrl };
+    clientRef.current.publish(MQTT_CONFIG.topicPub, JSON.stringify(cmd), { qos: 1 });
+    alert('Comando OTA enviado. Monitorea los logs del ESP32.');
+  };
+
+  const getStateClass = (state) => {
     switch(state) {
       case 'NORMAL': return 'state-normal';
       case 'ALERT': return 'state-alert';
@@ -114,167 +127,187 @@ function App() {
   }[connection];
 
   return (
-    <div className={`app-container theme-${theme}`}>
-      <header className="app-header" role="banner">
+    <div className={`app theme-${theme}`}>
+      {/* Header */}
+      <header className="header">
         <div className="header-content">
-          <h1 className="header-title">Evaluación 3</h1>
-          <div className="header-right">
-            <div 
-              className={`connection-badge connection-${connection}`}
-              role="status"
-              aria-live="polite"
-              aria-label={`Estado de conexión: ${connectionText}`}
-            >
+          <h1 className="header-title">Monitor de Vibración IoT</h1>
+          <div className="header-actions">
+            <span className={`connection-badge connection-${connection}`}>
               {connectionText}
-            </div>
-            <button
+            </span>
+            <button 
+              className="btn-theme"
               onClick={() => setTheme(prev => prev === 'dark' ? 'light' : 'dark')}
-              className="theme-button"
-              aria-label={`Cambiar a tema ${theme === 'dark' ? 'claro' : 'oscuro'}`}
+              aria-label="Cambiar tema"
             >
-              Tema {theme === 'dark' ? 'Claro' : 'Oscuro'}
+              {theme === 'dark' ? '☀️ Claro' : '🌙 Oscuro'}
             </button>
           </div>
         </div>
       </header>
 
-      <main className="app-main" role="main">
-        <section className="section" aria-label="Métricas del sistema">
-          <h2 className="section-title">Registros</h2>
+      <main className="main-content">
+        {/* Métricas */}
+        <section className="section">
+          <h2 className="section-title">Métricas del Sistema</h2>
           <div className="metrics-grid">
-            <article className="metric-card" aria-labelledby="temp-label">
-              <div className="metric-label" id="temp-label">Temperatura</div>
-              <div className="metric-value" aria-label={`Temperatura actual: ${telemetry.temperature?.toFixed(1) || 0} grados Celsius`}>
-                {telemetry.temperature?.toFixed(1) || '--'}°C
+            <div className="metric-card">
+              <div className="metric-label">Vibraciones Detectadas</div>
+              <div className="metric-value">{telemetry.vibration_count || 0}</div>
+              <div className="metric-info">Últimos 10 segundos</div>
+            </div>
+
+            <div className="metric-card">
+              <div className="metric-label">Estado Actual</div>
+              <div className="metric-value">
+                {telemetry.vibrating_now ? '🔴 Vibrando' : '🟢 Reposo'}
               </div>
               <div className="metric-info">Sensor: {telemetry.sensor}</div>
-            </article>
+            </div>
 
-            <article className="metric-card" aria-labelledby="hum-label">
-              <div className="metric-label" id="hum-label">Humedad</div>
-              <div className="metric-value" aria-label={`Humedad actual: ${telemetry.humidity?.toFixed(1) || 0} por ciento`}>
-                {telemetry.humidity?.toFixed(1) || '--'}%
+            <div className={`metric-card ${getStateClass(telemetry.state)}`}>
+              <div className="metric-label">Estado del Sistema</div>
+              <div className="metric-value">{telemetry.state || 'DESCONOCIDO'}</div>
+              <div className="metric-info">
+                Modo: {telemetry.manual ? 'Manual 🔧' : 'Automático ⚙️'}
               </div>
-              <div className="metric-info">Humedad Relativa</div>
-            </article>
+            </div>
 
-            <article className="metric-card" aria-labelledby="state-label">
-              <div className="metric-label" id="state-label">Estado Sistema</div>
-              <div 
-                className={`metric-value ${getStateColor(telemetry.state)}`}
-                aria-label={`Estado del sistema: ${telemetry.state || 'DESCONOCIDO'}`}
-              >
-                {telemetry.state || 'DESCONOCIDO'}
-              </div>
-              <div className="metric-info">Modo: {telemetry.manual ? 'Manual' : 'Automático'}</div>
-            </article>
-
-            <article className="metric-card" aria-labelledby="update-label">
-              <div className="metric-label" id="update-label">Última Actualización</div>
-              <div 
-                className="metric-value metric-value-small" 
-                aria-label={`Última actualización: ${new Date(telemetry.timestamp * 1000).toLocaleTimeString()}`}
-              >
+            <div className="metric-card">
+              <div className="metric-label">Última Actualización</div>
+              <div className="metric-value metric-value-small">
                 {new Date(telemetry.timestamp * 1000).toLocaleTimeString()}
               </div>
               <div className="metric-info">
-                Hace {Math.floor((Date.now() / 1000 - telemetry.timestamp) / 60)} minutos
+                Hace {Math.floor((Date.now() / 1000 - telemetry.timestamp) / 60)} min
               </div>
-            </article>
+            </div>
           </div>
         </section>
 
-        <section className="section" aria-labelledby="control-title">
-          <h2 className="section-title" id="control-title">Panel de Control</h2>
-          <div className="control-group">
-            <div className="control-item">
+        {/* Control Panel */}
+        <section className="section">
+          <h2 className="section-title">Panel de Control</h2>
+          <div className="control-grid">
+            <div className="control-card">
               <div className="control-header">
                 <div>
                   <div className="control-title">LED Indicador</div>
                   <div className="control-status">
-                    Estado: {telemetry.led ? 'Encendido' : 'Apagado'}
+                    Estado: {telemetry.led ? '🟢 Encendido' : '⚫ Apagado'}
                   </div>
                 </div>
               </div>
               <div className="button-group">
                 <button
+                  className="btn btn-success"
                   onClick={() => sendCommand('led', 1)}
                   disabled={connection !== 'connected'}
-                  className="btn btn-success"
-                  aria-label="Encender LED"
                 >
                   Encender
                 </button>
                 <button
+                  className="btn btn-danger"
                   onClick={() => sendCommand('led', 0)}
                   disabled={connection !== 'connected'}
-                  className="btn btn-danger"
-                  aria-label="Apagar LED"
                 >
                   Apagar
                 </button>
               </div>
             </div>
 
-            <div className="control-item">
+            <div className="control-card">
               <div className="control-header">
                 <div>
-                  <div className="control-title">Relay Ventilador</div>
+                  <div className="control-title">Relay (Actuador)</div>
                   <div className="control-status">
-                    Estado: {telemetry.relay ? 'Activado' : 'Desactivado'}
+                    Estado: {telemetry.relay ? '⚡ Activado' : '⭕ Desactivado'}
                   </div>
                 </div>
               </div>
               <div className="button-group">
                 <button
+                  className="btn btn-success"
                   onClick={() => sendCommand('relay', 1)}
                   disabled={connection !== 'connected'}
-                  className="btn btn-success"
-                  aria-label="Activar ventilador"
                 >
                   Activar
                 </button>
                 <button
+                  className="btn btn-danger"
                   onClick={() => sendCommand('relay', 0)}
                   disabled={connection !== 'connected'}
-                  className="btn btn-danger"
-                  aria-label="Desactivar ventilador"
                 >
                   Desactivar
                 </button>
               </div>
             </div>
+          </div>
 
+          <div className="action-buttons">
             <button
+              className="btn btn-primary"
               onClick={() => sendCommand('auto')}
               disabled={connection !== 'connected'}
-              className="btn btn-primary btn-full"
-              aria-label="Activar modo automático"
             >
-              Modo Automático
+              ⚙️ Modo Automático
             </button>
-
             <button
+              className="btn btn-secondary"
               onClick={() => sendCommand('test_sequence')}
               disabled={connection !== 'connected'}
-              className="btn btn-outline btn-full"
-              aria-label="Ejecutar secuencia de prueba"
             >
-              Ejecutar Secuencia de Prueba
+              🧪 Secuencia de Prueba
+            </button>
+            <button
+              className="btn btn-warning"
+              onClick={() => sendCommand('reset_counter')}
+              disabled={connection !== 'connected'}
+            >
+              🔄 Resetear Contador
             </button>
           </div>
         </section>
 
-        <section className="section" aria-labelledby="history-title">
-          <h2 className="section-title" id="history-title">Historial de Lecturas</h2>
-          <div className="table-container" role="region" aria-label="Tabla de historial de lecturas" tabIndex="0">
+        {/* OTA Update */}
+        <section className="section">
+          <h2 className="section-title">Actualización OTA</h2>
+          <div className="ota-card">
+            <div className="form-group">
+              <label className="form-label">URL del Firmware</label>
+              <input
+                type="text"
+                className="form-input"
+                value={otaUrl}
+                onChange={(e) => setOtaUrl(e.target.value)}
+                placeholder="https://..."
+              />
+            </div>
+            <button
+              className="btn btn-ota"
+              onClick={triggerOTA}
+              disabled={connection !== 'connected'}
+            >
+              📡 Iniciar Actualización OTA
+            </button>
+            <div className="warning-box">
+              ⚠️ El dispositivo se reiniciará después de la actualización
+            </div>
+          </div>
+        </section>
+
+        {/* History */}
+        <section className="section">
+          <h2 className="section-title">Historial de Lecturas</h2>
+          <div className="table-container">
             <table className="history-table">
               <thead>
                 <tr>
-                  <th scope="col">Hora</th>
-                  <th scope="col">Temperatura</th>
-                  <th scope="col">Humedad</th>
-                  <th scope="col">Estado</th>
+                  <th>Hora</th>
+                  <th>Vibraciones</th>
+                  <th>Vibrando</th>
+                  <th>Estado</th>
                 </tr>
               </thead>
               <tbody>
@@ -288,9 +321,9 @@ function App() {
                   history.slice().reverse().map((entry, idx) => (
                     <tr key={idx}>
                       <td>{entry.time}</td>
-                      <td>{entry.temp?.toFixed(1)}°C</td>
-                      <td>{entry.hum?.toFixed(1)}%</td>
-                      <td className={getStateColor(entry.state)}>
+                      <td>{entry.vibCount}</td>
+                      <td>{entry.vibrating ? '🔴 Sí' : '🟢 No'}</td>
+                      <td className={getStateClass(entry.state)}>
                         {entry.state}
                       </td>
                     </tr>
@@ -301,11 +334,10 @@ function App() {
           </div>
         </section>
 
-        <section className="section" aria-labelledby="student-info-title">
-          <div className="student-info">
-            <h2 className="student-name" id="student-info-title">
-              Pedro Javier Ramirez Ramirez
-            </h2>
+        {/* Student Info */}
+        <section className="section">
+          <div className="student-card">
+            <h2 className="student-name">Pedro Javier Ramirez Ramirez</h2>
             <div className="metric-label">Matrícula</div>
             <div className="student-id">2023171040</div>
           </div>
