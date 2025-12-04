@@ -393,6 +393,157 @@ body {
 }
 
 /* ========================================
+   OTA LOG STYLES
+======================================== */
+.ota-log {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid var(--border-color);
+}
+
+.ota-log-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.ota-log-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.btn-clear-log {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-danger);
+  border-radius: 6px;
+  background-color: transparent;
+  color: var(--color-danger);
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.btn-clear-log:hover {
+  background-color: var(--color-danger);
+  color: white;
+  transform: translateY(-1px);
+}
+
+.ota-log-content {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 1rem;
+  max-height: 300px;
+  overflow-y: auto;
+  font-family: 'Courier New', Consolas, monospace;
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+/* Scrollbar personalizado */
+.ota-log-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.ota-log-content::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+  border-radius: 4px;
+}
+
+.ota-log-content::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.ota-log-content::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+.ota-log-entry {
+  padding: 0.5rem;
+  margin-bottom: 0.25rem;
+  border-left: 3px solid transparent;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+  transition: all 0.2s;
+}
+
+.ota-log-entry:hover {
+  background-color: var(--bg-card);
+  border-radius: 4px;
+}
+
+.ota-log-entry:last-child {
+  margin-bottom: 0;
+}
+
+.ota-log-time {
+  color: var(--text-secondary);
+  white-space: nowrap;
+  font-weight: 600;
+  min-width: 80px;
+}
+
+.ota-log-message {
+  color: var(--text-primary);
+  word-break: break-word;
+  flex: 1;
+}
+
+/* Estados del log */
+.ota-log-entry.log-success {
+  border-left-color: var(--color-success);
+  background-color: rgba(34, 197, 94, 0.05);
+}
+
+.ota-log-entry.log-success .ota-log-message {
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+.ota-log-entry.log-error {
+  border-left-color: var(--color-danger);
+  background-color: rgba(239, 68, 68, 0.05);
+}
+
+.ota-log-entry.log-error .ota-log-message {
+  color: var(--color-danger);
+  font-weight: 600;
+}
+
+.ota-log-entry.log-info {
+  border-left-color: var(--color-primary);
+  background-color: rgba(59, 130, 246, 0.05);
+}
+
+.ota-log-entry.log-info .ota-log-message {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+/* Animación para nuevos mensajes */
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.ota-log-entry {
+  animation: slideIn 0.3s ease-out;
+}
+
+/* ========================================
    HISTORY TABLE
 ======================================== */
 .table-container {
@@ -499,6 +650,20 @@ body {
   .metric-value {
     font-size: 2rem;
   }
+
+  .ota-log-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .btn-clear-log {
+    width: 100%;
+  }
+
+  .ota-log-content {
+    max-height: 200px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -518,6 +683,15 @@ body {
 
   .metric-value {
     font-size: 1.75rem;
+  }
+
+  .ota-log-time {
+    min-width: 70px;
+    font-size: 0.75rem;
+  }
+
+  .ota-log-message {
+    font-size: 0.8rem;
   }
 }
 

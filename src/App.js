@@ -17,6 +17,7 @@ function App() {
   const [connection, setConnection] = useState('disconnected');
   const [history, setHistory] = useState([]);
   const [otaUrl, setOtaUrl] = useState('https://ota-server-320033886492.us-central1.run.app/firmware');
+  const [otaLog, setOtaLog] = useState([]);
   const clientRef = useRef(null);
 
   const MQTT_CONFIG = {
@@ -51,7 +52,20 @@ function App() {
 
         client.on('message', (topic, message) => {
           try {
-            const data = JSON.parse(message.toString());
+            const msgStr = message.toString();
+            
+            // Detectar mensajes de OTA
+            if (msgStr.includes('OTA') || msgStr.includes('Reboot')) {
+              setOtaLog(prev => {
+                const newLog = [...prev, {
+                  time: new Date().toLocaleTimeString(),
+                  message: msgStr
+                }];
+                return newLog.slice(-10); // Mantener últimos 10 mensajes
+              });
+            }
+            
+            const data = JSON.parse(msgStr);
             setTelemetry(prev => ({
               ...prev,
               ...data,
@@ -67,6 +81,17 @@ function App() {
               return newHistory.slice(-20);
             });
           } catch (e) {
+            // Si no es JSON, podría ser un mensaje de texto (como los de OTA)
+            const msgStr = message.toString();
+            if (msgStr.includes('OTA') || msgStr.includes('Reboot')) {
+              setOtaLog(prev => {
+                const newLog = [...prev, {
+                  time: new Date().toLocaleTimeString(),
+                  message: msgStr
+                }];
+                return newLog.slice(-10);
+              });
+            }
             console.error('Error parseando mensaje:', e);
           }
         });
@@ -108,6 +133,19 @@ function App() {
     const cmd = { action: 'ota', url: otaUrl };
     clientRef.current.publish(MQTT_CONFIG.topicPub, JSON.stringify(cmd), { qos: 1 });
     alert('Comando OTA enviado. Monitorea los logs del ESP32.');
+    
+    // Agregar mensaje local al log
+    setOtaLog(prev => {
+      const newLog = [...prev, {
+        time: new Date().toLocaleTimeString(),
+        message: '📤 Comando OTA enviado desde dashboard'
+      }];
+      return newLog.slice(-10);
+    });
+  };
+
+  const clearOtaLog = () => {
+    setOtaLog([]);
   };
 
   const getStateClass = (state) => {
@@ -294,6 +332,37 @@ function App() {
             <div className="warning-box">
               ⚠️ El dispositivo se reiniciará después de la actualización
             </div>
+            
+            {/* OTA Log */}
+            {otaLog.length > 0 && (
+              <div className="ota-log">
+                <div className="ota-log-header">
+                  <h3 className="ota-log-title">📋 Log de OTA</h3>
+                  <button 
+                    className="btn-clear-log"
+                    onClick={clearOtaLog}
+                    title="Limpiar log"
+                  >
+                    🗑️ Limpiar
+                  </button>
+                </div>
+                <div className="ota-log-content">
+                  {otaLog.slice().reverse().map((entry, idx) => (
+                    <div 
+                      key={idx} 
+                      className={`ota-log-entry ${
+                        entry.message.includes('SUCCESS') ? 'log-success' :
+                        entry.message.includes('FAILED') ? 'log-error' :
+                        entry.message.includes('STARTED') ? 'log-info' : ''
+                      }`}
+                    >
+                      <span className="ota-log-time">[{entry.time}]</span>
+                      <span className="ota-log-message">{entry.message}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </section>
 
