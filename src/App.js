@@ -19,6 +19,7 @@ function App() {
   const [otaUrl, setOtaUrl] = useState('https://ota-server-320033886492.us-central1.run.app/firmware');
   const [otaLog, setOtaLog] = useState([]);
   const clientRef = useRef(null);
+  const otaLogRef = useRef(null);
 
   const MQTT_CONFIG = {
     host: 'befdaf08.ala.us-east-1.emqxsl.com',
@@ -30,6 +31,13 @@ function App() {
     topicSub: '2023171040/telemetry',
     topicPub: '2023171040/cmd'
   };
+
+  // Auto-scroll del log cuando hay nuevos mensajes
+  useEffect(() => {
+    if (otaLogRef.current) {
+      otaLogRef.current.scrollTop = 0; // Scroll al inicio (más reciente)
+    }
+  }, [otaLog]);
 
   useEffect(() => {
     const connectMQTT = () => {
@@ -54,17 +62,37 @@ function App() {
           try {
             const msgStr = message.toString();
             
-            // Detectar mensajes de OTA
-            if (msgStr.includes('OTA') || msgStr.includes('Reboot')) {
+            // Detectar mensajes de OTA con múltiples patrones
+            const isOtaMessage = msgStr.includes('[OTA]') || 
+                                 msgStr.includes('OTA') || 
+                                 msgStr.includes('Reboot') ||
+                                 msgStr.includes('Reiniciando') ||
+                                 msgStr.includes('firmware') ||
+                                 msgStr.includes('Descarga') ||
+                                 msgStr.includes('Validando') ||
+                                 msgStr.includes('Progreso') ||
+                                 msgStr.includes('Partición') ||
+                                 msgStr.includes('KB') ||
+                                 msgStr.includes('bytes') ||
+                                 msgStr.includes('validado') ||
+                                 msgStr.includes('completado') ||
+                                 msgStr.includes('exitosamente') ||
+                                 msgStr.includes('ERROR:') ||
+                                 msgStr.includes('Conectando') ||
+                                 msgStr.includes('Configurando');
+            
+            if (isOtaMessage) {
               setOtaLog(prev => {
                 const newLog = [...prev, {
                   time: new Date().toLocaleTimeString(),
-                  message: msgStr
+                  message: msgStr,
+                  timestamp: Date.now()
                 }];
-                return newLog.slice(-10); // Mantener últimos 10 mensajes
+                return newLog.slice(-50); // Mantener últimos 50 mensajes
               });
             }
             
+            // Intentar parsear como JSON para telemetría
             const data = JSON.parse(msgStr);
             setTelemetry(prev => ({
               ...prev,
@@ -81,18 +109,36 @@ function App() {
               return newHistory.slice(-20);
             });
           } catch (e) {
-            // Si no es JSON, podría ser un mensaje de texto (como los de OTA)
+            // Si no es JSON, verificar si es mensaje de OTA
             const msgStr = message.toString();
-            if (msgStr.includes('OTA') || msgStr.includes('Reboot')) {
+            const isOtaMessage = msgStr.includes('[OTA]') || 
+                                 msgStr.includes('OTA') || 
+                                 msgStr.includes('Reboot') ||
+                                 msgStr.includes('Reiniciando') ||
+                                 msgStr.includes('firmware') ||
+                                 msgStr.includes('Descarga') ||
+                                 msgStr.includes('Validando') ||
+                                 msgStr.includes('Progreso') ||
+                                 msgStr.includes('Partición') ||
+                                 msgStr.includes('KB') ||
+                                 msgStr.includes('bytes') ||
+                                 msgStr.includes('validado') ||
+                                 msgStr.includes('completado') ||
+                                 msgStr.includes('exitosamente') ||
+                                 msgStr.includes('ERROR:') ||
+                                 msgStr.includes('Conectando') ||
+                                 msgStr.includes('Configurando');
+            
+            if (isOtaMessage) {
               setOtaLog(prev => {
                 const newLog = [...prev, {
                   time: new Date().toLocaleTimeString(),
-                  message: msgStr
+                  message: msgStr,
+                  timestamp: Date.now()
                 }];
-                return newLog.slice(-10);
+                return newLog.slice(-50);
               });
             }
-            console.error('Error parseando mensaje:', e);
           }
         });
 
@@ -132,20 +178,22 @@ function App() {
     
     const cmd = { action: 'ota', url: otaUrl };
     clientRef.current.publish(MQTT_CONFIG.topicPub, JSON.stringify(cmd), { qos: 1 });
-    alert('Comando OTA enviado. Monitorea los logs del ESP32.');
     
     // Agregar mensaje local al log
     setOtaLog(prev => {
       const newLog = [...prev, {
         time: new Date().toLocaleTimeString(),
-        message: '📤 Comando OTA enviado desde dashboard'
+        message: '📤 Comando OTA enviado desde dashboard',
+        timestamp: Date.now()
       }];
-      return newLog.slice(-10);
+      return newLog.slice(-50);
     });
   };
 
   const clearOtaLog = () => {
-    setOtaLog([]);
+    if (window.confirm('¿Deseas limpiar el log de OTA?')) {
+      setOtaLog([]);
+    }
   };
 
   const getStateClass = (state) => {
@@ -155,6 +203,32 @@ function App() {
       case 'CRITICAL': return 'state-critical';
       default: return 'state-default';
     }
+  };
+
+  const getLogClass = (msg) => {
+    // Clasificar mensaje por contenido
+    if (msg.includes('✅') || msg.includes('completado') || msg.includes('exitosamente') || msg.includes('validado correctamente')) {
+      return 'log-success';
+    } else if (msg.includes('❌') || msg.includes('ERROR') || msg.includes('FAILED') || msg.includes('fallida') || msg.includes('corrupta')) {
+      return 'log-error';
+    } else if (msg.includes('⚠️') || msg.includes('WARNING') || msg.includes('abortado')) {
+      return 'log-warning';
+    } else if (msg.includes('🚀') || msg.includes('Iniciando') || msg.includes('STARTED')) {
+      return 'log-info';
+    } else if (msg.includes('📊') || msg.includes('Progreso') || msg.includes('%')) {
+      return 'log-progress';
+    } else if (msg.includes('🔄') || msg.includes('Reiniciando')) {
+      return 'log-reboot';
+    } else if (msg.includes('📦') || msg.includes('Tamaño') || msg.includes('📍') || msg.includes('📥')) {
+      return 'log-data';
+    } else if (msg.includes('🔗') || msg.includes('Conectando')) {
+      return 'log-connection';
+    } else if (msg.includes('🔍') || msg.includes('Validando')) {
+      return 'log-validation';
+    } else if (msg.includes('💾') || msg.includes('Configurando')) {
+      return 'log-config';
+    }
+    return '';
   };
 
   const connectionText = {
@@ -337,7 +411,7 @@ function App() {
             {otaLog.length > 0 && (
               <div className="ota-log">
                 <div className="ota-log-header">
-                  <h3 className="ota-log-title">📋 Log de OTA</h3>
+                  <h3 className="ota-log-title">📋 Log de Actualización OTA</h3>
                   <button 
                     className="btn-clear-log"
                     onClick={clearOtaLog}
@@ -346,20 +420,19 @@ function App() {
                     🗑️ Limpiar
                   </button>
                 </div>
-                <div className="ota-log-content">
+                <div className="ota-log-content" ref={otaLogRef}>
                   {otaLog.slice().reverse().map((entry, idx) => (
                     <div 
-                      key={idx} 
-                      className={`ota-log-entry ${
-                        entry.message.includes('SUCCESS') ? 'log-success' :
-                        entry.message.includes('FAILED') ? 'log-error' :
-                        entry.message.includes('STARTED') ? 'log-info' : ''
-                      }`}
+                      key={entry.timestamp || idx} 
+                      className={`ota-log-entry ${getLogClass(entry.message)}`}
                     >
                       <span className="ota-log-time">[{entry.time}]</span>
                       <span className="ota-log-message">{entry.message}</span>
                     </div>
                   ))}
+                </div>
+                <div className="ota-log-footer">
+                  Total de mensajes: {otaLog.length}
                 </div>
               </div>
             )}

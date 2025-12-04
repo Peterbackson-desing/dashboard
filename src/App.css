@@ -30,6 +30,8 @@ body {
   --color-danger: #ef4444;
   --color-warning: #f59e0b;
   --color-primary: #3b82f6;
+  --color-info: #06b6d4;
+  --color-purple: #8b5cf6;
   
   --state-normal: #22c55e;
   --state-alert: #f59e0b;
@@ -48,6 +50,8 @@ body {
   --color-danger: #dc2626;
   --color-warning: #d97706;
   --color-primary: #2563eb;
+  --color-info: #0891b2;
+  --color-purple: #7c3aed;
   
   --state-normal: #16a34a;
   --state-alert: #d97706;
@@ -194,7 +198,7 @@ body {
 }
 
 .btn-ota {
-  background-color: #8b5cf6;
+  background-color: var(--color-purple);
   color: white;
   width: 100%;
   padding: 1rem;
@@ -438,26 +442,26 @@ body {
   border: 1px solid var(--border-color);
   border-radius: 6px;
   padding: 1rem;
-  max-height: 300px;
+  max-height: 500px;
   overflow-y: auto;
   font-family: 'Courier New', Consolas, monospace;
   font-size: 0.875rem;
-  line-height: 1.6;
+  line-height: 1.8;
 }
 
 /* Scrollbar personalizado */
 .ota-log-content::-webkit-scrollbar {
-  width: 8px;
+  width: 10px;
 }
 
 .ota-log-content::-webkit-scrollbar-track {
   background: var(--bg-primary);
-  border-radius: 4px;
+  border-radius: 5px;
 }
 
 .ota-log-content::-webkit-scrollbar-thumb {
   background: var(--border-color);
-  border-radius: 4px;
+  border-radius: 5px;
 }
 
 .ota-log-content::-webkit-scrollbar-thumb:hover {
@@ -465,18 +469,18 @@ body {
 }
 
 .ota-log-entry {
-  padding: 0.5rem;
-  margin-bottom: 0.25rem;
+  padding: 0.6rem;
+  margin-bottom: 0.35rem;
   border-left: 3px solid transparent;
   display: flex;
   gap: 0.75rem;
   align-items: flex-start;
   transition: all 0.2s;
+  border-radius: 4px;
 }
 
 .ota-log-entry:hover {
   background-color: var(--bg-card);
-  border-radius: 4px;
 }
 
 .ota-log-entry:last-child {
@@ -487,19 +491,21 @@ body {
   color: var(--text-secondary);
   white-space: nowrap;
   font-weight: 600;
-  min-width: 80px;
+  min-width: 85px;
+  font-size: 0.813rem;
 }
 
 .ota-log-message {
   color: var(--text-primary);
   word-break: break-word;
   flex: 1;
+  line-height: 1.6;
 }
 
-/* Estados del log */
+/* Estados del log con emojis y colores específicos */
 .ota-log-entry.log-success {
   border-left-color: var(--color-success);
-  background-color: rgba(34, 197, 94, 0.05);
+  background-color: rgba(34, 197, 94, 0.08);
 }
 
 .ota-log-entry.log-success .ota-log-message {
@@ -509,22 +515,110 @@ body {
 
 .ota-log-entry.log-error {
   border-left-color: var(--color-danger);
-  background-color: rgba(239, 68, 68, 0.05);
+  background-color: rgba(239, 68, 68, 0.08);
 }
 
 .ota-log-entry.log-error .ota-log-message {
   color: var(--color-danger);
+  font-weight: 700;
+}
+
+.ota-log-entry.log-warning {
+  border-left-color: var(--color-warning);
+  background-color: rgba(245, 158, 11, 0.08);
+}
+
+.ota-log-entry.log-warning .ota-log-message {
+  color: var(--color-warning);
   font-weight: 600;
 }
 
 .ota-log-entry.log-info {
   border-left-color: var(--color-primary);
-  background-color: rgba(59, 130, 246, 0.05);
+  background-color: rgba(59, 130, 246, 0.08);
 }
 
 .ota-log-entry.log-info .ota-log-message {
   color: var(--color-primary);
   font-weight: 600;
+}
+
+.ota-log-entry.log-progress {
+  border-left-color: var(--color-info);
+  background-color: rgba(6, 182, 212, 0.06);
+}
+
+.ota-log-entry.log-progress .ota-log-message {
+  color: var(--color-info);
+  font-weight: 500;
+}
+
+.ota-log-entry.log-reboot {
+  border-left-color: var(--color-purple);
+  background-color: rgba(139, 92, 246, 0.08);
+}
+
+.ota-log-entry.log-reboot .ota-log-message {
+  color: var(--color-purple);
+  font-weight: 700;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.ota-log-entry.log-data {
+  border-left-color: #10b981;
+  background-color: rgba(16, 185, 129, 0.05);
+}
+
+.ota-log-entry.log-data .ota-log-message {
+  color: #10b981;
+}
+
+.ota-log-entry.log-connection {
+  border-left-color: #14b8a6;
+  background-color: rgba(20, 184, 166, 0.05);
+}
+
+.ota-log-entry.log-connection .ota-log-message {
+  color: #14b8a6;
+}
+
+.ota-log-entry.log-validation {
+  border-left-color: #a855f7;
+  background-color: rgba(168, 85, 247, 0.05);
+}
+
+.ota-log-entry.log-validation .ota-log-message {
+  color: #a855f7;
+}
+
+.ota-log-entry.log-config {
+  border-left-color: #f59e0b;
+  background-color: rgba(245, 158, 11, 0.05);
+}
+
+.ota-log-entry.log-config .ota-log-message {
+  color: #f59e0b;
+}
+
+/* Footer del log */
+.ota-log-footer {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  text-align: right;
+  font-weight: 500;
+}
+
+/* Animación de pulso para mensajes de reinicio */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
 }
 
 /* Animación para nuevos mensajes */
@@ -662,7 +756,16 @@ body {
   }
 
   .ota-log-content {
-    max-height: 200px;
+    max-height: 300px;
+  }
+
+  .ota-log-time {
+    min-width: 75px;
+    font-size: 0.75rem;
+  }
+
+  .ota-log-message {
+    font-size: 0.813rem;
   }
 }
 
@@ -687,11 +790,11 @@ body {
 
   .ota-log-time {
     min-width: 70px;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
   }
 
   .ota-log-message {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
   }
 }
 
@@ -720,12 +823,14 @@ body {
   .header-actions,
   .control-grid,
   .action-buttons,
-  .ota-card {
+  .btn-ota,
+  .btn-clear-log {
     display: none;
   }
 
   .metric-card,
-  .table-container {
+  .table-container,
+  .ota-log {
     break-inside: avoid;
   }
 }
